@@ -1,0 +1,224 @@
+openapi: 3.0.0
+servers:
+- url: "https://apiname.execute-api.region.aws.com/{basePath}"
+  variables:
+    basePath:
+      default: "/stagename"
+  x-amazon-apigateway-endpoint-configuration: 
+    disableExecuteApiEndpoint: true
+info:
+  description: Vulnerability API service which provides secure API based access to the vulnerability database
+  version: "1.0.0"
+  title: Vulnerability API
+tags:
+  - name: clients
+    description: Operations available to customers
+  - name: admins
+    description: Operations available to Admins
+x-amazon-apigateway-request-validators: 
+  basic:
+    validateRequestBody : true
+    validateRequestParameters : true
+x-amazon-apigateway-request-validator: basic
+paths:
+  /vuln:
+    get:
+      tags:
+        - clients
+      summary: gets vulnerabilities for a particular client
+      operationId: getVulnerabilities
+      description: |
+        By passing in the org name, you can get the vulnerabilities for that org
+      parameters:
+        - in: query
+          name: org
+          description: pass the org name for fetching vulnerabilities for that Org
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: get vulnerabilities matching org name
+        '400':
+          description: bad input parameter
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Unauthorized
+      # https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-integration.html      
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${lambda_api_backend}/invocations"
+        type: "aws"
+        httpMethod: "POST"
+        passthroughBehavior: "NEVER"
+        requestTemplates:
+          application/json: |
+            ##  See http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
+            ##  Hi! This template will pass through all parameters including path, querystring, header, stage variables, and context through to the integration endpoint via the body/payload
+            #set($allParams = $input.params())
+            {
+            "body-json" : $input.json('$'),
+            "params" : {
+            #foreach($type in $allParams.keySet())
+                #set($params = $allParams.get($type))
+            "$type" : {
+                #foreach($paramName in $params.keySet())
+                "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
+                    #if($foreach.hasNext),#end
+                #end
+            }
+                #if($foreach.hasNext),#end
+            #end
+            },
+            "stage-variables" : {
+            #foreach($key in $stageVariables.keySet())
+            "$key" : "$util.escapeJavaScript($stageVariables.get($key))"
+                #if($foreach.hasNext),#end
+            #end
+            },
+            "context" : {
+                "account-id" : "$context.identity.accountId",
+                "api-id" : "$context.apiId",
+                "api-key" : "$context.identity.apiKey",
+                "authorizer-principal-id" : "$context.authorizer.principalId",
+                "caller" : "$context.identity.caller",
+                "cognito-authentication-provider" : "$context.identity.cognitoAuthenticationProvider",
+                "cognito-authentication-type" : "$context.identity.cognitoAuthenticationType",
+                "cognito-identity-id" : "$context.identity.cognitoIdentityId",
+                "cognito-identity-pool-id" : "$context.identity.cognitoIdentityPoolId",
+                "http-method" : "$context.httpMethod",
+                "stage" : "$context.stage",
+                "source-ip" : "$context.identity.sourceIp",
+                "user" : "$context.identity.user",
+                "user-agent" : "$context.identity.userAgent",
+                "user-arn" : "$context.identity.userArn",
+                "request-id" : "$context.requestId",
+                "resource-id" : "$context.resourceId",
+                "resource-path" : "$context.resourcePath"
+                }
+            }
+        requestParameters:
+          integration.request.querystring.org: "method.request.querystring.org"
+        credentials: "arn:aws:iam::259963121161:role/api_gateway_auth_invocation_get"
+        responses:
+          '': 
+            statusCode : 200
+      security:
+        - GetAuthorizer: []
+    post:
+      tags:
+        - admins
+      summary: posts vulnerabilities for a particular client
+      operationId: postVulnerabilities
+      description: |
+        Import the vulnerabilities for a particular org
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vulnerability'
+      responses:
+        '200':
+          description: get vulnerabilities matching client name
+        '400':
+          description: bad input parameter
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${lambda_api_backend_post}/invocations"
+        type: aws
+        passthroughBehavior: "NEVER"
+        requestTemplates:
+          application/json: |
+            ##  See http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
+            ##  Hi! This template will pass through all parameters including path, querystring, header, stage variables, and context through to the integration endpoint via the body/payload
+            #set($allParams = $input.params())
+            {
+            "body-json" : $input.json('$'),
+            "params" : {
+            #foreach($type in $allParams.keySet())
+                #set($params = $allParams.get($type))
+            "$type" : {
+                #foreach($paramName in $params.keySet())
+                "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
+                    #if($foreach.hasNext),#end
+                #end
+            }
+                #if($foreach.hasNext),#end
+            #end
+            },
+            "stage-variables" : {
+            #foreach($key in $stageVariables.keySet())
+            "$key" : "$util.escapeJavaScript($stageVariables.get($key))"
+                #if($foreach.hasNext),#end
+            #end
+            },
+            "context" : {
+                "account-id" : "$context.identity.accountId",
+                "api-id" : "$context.apiId",
+                "api-key" : "$context.identity.apiKey",
+                "authorizer-principal-id" : "$context.authorizer.principalId",
+                "caller" : "$context.identity.caller",
+                "cognito-authentication-provider" : "$context.identity.cognitoAuthenticationProvider",
+                "cognito-authentication-type" : "$context.identity.cognitoAuthenticationType",
+                "cognito-identity-id" : "$context.identity.cognitoIdentityId",
+                "cognito-identity-pool-id" : "$context.identity.cognitoIdentityPoolId",
+                "http-method" : "$context.httpMethod",
+                "stage" : "$context.stage",
+                "source-ip" : "$context.identity.sourceIp",
+                "user" : "$context.identity.user",
+                "user-agent" : "$context.identity.userAgent",
+                "user-arn" : "$context.identity.userArn",
+                "request-id" : "$context.requestId",
+                "resource-id" : "$context.resourceId",
+                "resource-path" : "$context.resourcePath"
+                }
+            }
+        httpMethod: "POST"
+        credentials: "arn:aws:iam::259963121161:role/api_gateway_auth_invocation_get"
+        responses:
+          '': 
+            statusCode : 200
+      security:
+        - PostAuthorizer: []
+components:
+  schemas:
+    Vulnerability:
+      #$schema: "http://json-schema.org/draft-04/schema#"
+      title: "VulnerabilityInputModel"
+      type: "object"
+      properties: 
+        VulnID:
+          type: string
+        Org:
+          type: string
+        AssetName:
+          type: string
+        DueDate:
+          type: string
+        PluginId:
+          type: number
+        PluginName:
+          type: string
+        Priority:
+          type: string        
+  securitySchemes:
+    GetAuthorizer:
+      type: "apiKey"
+      name: "Authorization"
+      in : "header"
+      x-amazon-apigateway-authtype: "custom"
+      x-amazon-apigateway-authorizer:
+        authorizerUri: "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${lambda_get_authorizer}/invocations"        
+        type: request
+        authorizerCredentials: "arn:aws:iam::259963121161:role/api_gateway_auth_invocation_get"
+        authorizerResultTtlInSeconds: 0
+    PostAuthorizer:
+      type: "apiKey"
+      name: "Authorization"
+      in : "header"
+      x-amazon-apigateway-authtype: "custom"
+      x-amazon-apigateway-authorizer:
+        authorizerUri: "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${lambda_post_authorizer}/invocations"                
+        type: request
+        authorizerCredentials: "arn:aws:iam::259963121161:role/api_gateway_auth_invocation_get"
+        authorizerResultTtlInSeconds: 0
+

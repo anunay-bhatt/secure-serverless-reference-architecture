@@ -35,9 +35,15 @@ Table here with "Security Area" and "Security Control"
         </tr>
         <tr>
             <td>Lambda authrozation with OU</td>
-        </tr>        
+        </tr>  
+        <tr>
+            <td rowspan=4>Logging</td>
+            <td rowspan=2>Cloudwatch</td>
+        </tr>
     </tbody>
 </table>
+
+
 
 <table>
     <thead>

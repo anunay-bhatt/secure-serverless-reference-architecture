@@ -12,9 +12,13 @@ The service uses AWS serverless components and the infratructure can be deployed
 
 Table here with "Security Area" and "Security Control"
 
-Authentication = mTLS
-Authroization = Lambda authrozation with OU 
-AWS IAM = Least privilege
-CloudWatch Logging for each component
-Network Security = API Gateway resource policy
-Web Application Security  = API gateway throttling, Usage plans
+| Security Area      | Security Control |
+| :---        |    :----:   | 
+| Authentication      | mTLS       | 
+| Authorization   | Lambda authrozation with OU         | 
+| Least Privilege   | Lambda authrozation with OU         | 
+| Logging   | Lambda authrozation with OU         |
+| Network Security| API Gateway resource policy        |
+| Web Application Security| API gateway throttling, Usage plans        |
+
+

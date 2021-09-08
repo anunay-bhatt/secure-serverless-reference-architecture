@@ -33,6 +33,9 @@ Table here with "Security Area" and "Security Control"
             <td rowspan=4>IAM</td>
             <td rowspan=2>Authentication with mTLS</td>
         </tr>
+        <tr>
+            <td rowspan=2>Lambda authrozation with OU</td>
+        </tr>        
     </tbody>
 </table>
 

@@ -12,14 +12,6 @@ The service uses AWS serverless components and the infratructure can be deployed
 
 Table here with "Security Area" and "Security Control"
 
-| Security Area      | Security Control |
-| :---        |    :----:   | 
-| Authentication      | mTLS       | 
-| Authorization   | Lambda authrozation with OU         | 
-| Least Privilege   | Lambda authrozation with OU         | 
-| Logging   | Lambda authrozation with OU         |
-| Network Security| API Gateway resource policy        |
-| Web Application Security| API gateway throttling, Usage plans        |
 
 <table>
     <thead>
@@ -30,12 +22,15 @@ Table here with "Security Area" and "Security Control"
     </thead>
     <tbody>
         <tr>
-            <td rowspan=2>IAM</td>
+            <td rowspan=3>IAM</td>
             <td>Authentication with mTLS</td>
         </tr>
         <tr>
             <td>Lambda authrozation with OU</td>
-        </tr>  
+        </tr>
+        <tr>
+            <td>Least Privilege</td>
+        </tr>
         <tr>
             <td rowspan=2>Logging</td>
             <td>Cloudwatch</td>
@@ -43,35 +38,13 @@ Table here with "Security Area" and "Security Control"
         <tr>
             <td>Cloudwatch2</td>
         </tr>  
-    </tbody>
-</table>
-
-
-
-<table>
-    <thead>
         <tr>
-            <th>Layer 1</th>
-            <th>Layer 2</th>
-            <th>Layer 3</th>
+            <td rowspan=2>Network Security</td>
+            <td>API Gateway resource policy</td>
         </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td rowspan=4>L1 Name</td>
-            <td rowspan=2>L2 Name A</td>
-            <td>L3 Name A</td>
-        </tr>
-        <tr>
-            <td>L3 Name B</td>
-        </tr>
-        <tr>
-            <td rowspan=2>L2 Name B</td>
-            <td>L3 Name C</td>
-        </tr>
-        <tr>
-            <td>L3 Name D</td>
-        </tr>
+         <tr>
+            <td>Test</td>
+        </tr>  
     </tbody>
 </table>
 

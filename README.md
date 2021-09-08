@@ -7,3 +7,14 @@ VMS is a Vulnerability API service which provides secure API based access to the
 ## Architecture and Infrastructural components
 
 The service uses AWS serverless components and the infratructure can be deployed via Terraform. Below is a simple architecture:
+
+## Security Controls
+
+Table here with "Security Area" and "Security Control"
+
+Authentication = mTLS
+Authroization = Lambda authrozation with OU 
+AWS IAM = Least privilege
+CloudWatch Logging for each component
+Network Security = API Gateway resource policy
+Web Application Security  = API gateway throttling, Usage plans

@@ -44,7 +44,11 @@ Table here with "Security Area" and "Security Control"
         </tr>
          <tr>
             <td>Test</td>
-        </tr>  
+        </tr> 
+         <tr>
+            <td rowspan=2>Data Protection</td>
+            <td>Backup of DynamoDB</td>
+        </tr>
     </tbody>
 </table>
 

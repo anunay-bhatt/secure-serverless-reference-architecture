@@ -30,16 +30,19 @@ Table here with "Security Area" and "Security Control"
     </thead>
     <tbody>
         <tr>
-            <td>IAM</td>
+            <td rowspan=2>IAM</td>
             <td>Authentication with mTLS</td>
         </tr>
         <tr>
             <td>Lambda authrozation with OU</td>
         </tr>  
         <tr>
-            <td>Logging</td>
+            <td rowspan=2>Logging</td>
             <td>Cloudwatch</td>
         </tr>
+        <tr>
+            <td>Cloudwatch2</td>
+        </tr>  
     </tbody>
 </table>
 

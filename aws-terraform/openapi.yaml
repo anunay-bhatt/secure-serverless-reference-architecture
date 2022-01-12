@@ -99,7 +99,7 @@ paths:
             }
         requestParameters:
           integration.request.querystring.org: "method.request.querystring.org"
-        credentials: "arn:aws:iam::259963121161:role/api_gateway_auth_invocation_get"
+        credentials: "${api_invoke_role}"
         responses:
           '': 
             statusCode : 200
@@ -173,7 +173,7 @@ paths:
                 }
             }
         httpMethod: "POST"
-        credentials: "arn:aws:iam::259963121161:role/api_gateway_auth_invocation_get"
+        credentials: "${api_invoke_role}"
         responses:
           '': 
             statusCode : 200
@@ -185,21 +185,32 @@ components:
       #$schema: "http://json-schema.org/draft-04/schema#"
       title: "VulnerabilityInputModel"
       type: "object"
-      properties: 
+      properties:
         VulnID:
           type: string
+          #Matches only characters, numbers, hyphen, dot and underscore
+          pattern: ^[a-zA-Z0-9-_.]*$
         Org:
           type: string
+          #Matches only characters, numbers, hyphen, dot, space and underscore
+          pattern: ^[a-zA-Z0-9-_. ]*$
         AssetName:
           type: string
+          #Matches only characters, numbers, hyphen, dot and underscore
+          pattern: ^[a-zA-Z0-9-_.]*$
         DueDate:
           type: string
+          pattern: ^[0-1][0-9]-[0-3][0-9]-[2-9][0-9][0-9][0-9]*
         PluginId:
           type: number
         PluginName:
           type: string
+          #Matches only characters, numbers, hyphen, dot, space and underscore
+          pattern: ^[a-zA-Z0-9-_. ]*$
         Priority:
-          type: string        
+          type: string
+          #Matches only characters, numbers and hyphen
+          pattern: ^[a-zA-Z0-9-]*$        
   securitySchemes:
     GetAuthorizer:
       type: "apiKey"
@@ -209,7 +220,7 @@ components:
       x-amazon-apigateway-authorizer:
         authorizerUri: "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${lambda_get_authorizer}/invocations"        
         type: request
-        authorizerCredentials: "arn:aws:iam::259963121161:role/api_gateway_auth_invocation_get"
+        authorizerCredentials: "${api_invoke_role}"
         authorizerResultTtlInSeconds: 0
     PostAuthorizer:
       type: "apiKey"
@@ -219,6 +230,6 @@ components:
       x-amazon-apigateway-authorizer:
         authorizerUri: "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${lambda_post_authorizer}/invocations"                
         type: request
-        authorizerCredentials: "arn:aws:iam::259963121161:role/api_gateway_auth_invocation_get"
+        authorizerCredentials: "${api_invoke_role}"
         authorizerResultTtlInSeconds: 0
 

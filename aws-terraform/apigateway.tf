@@ -7,7 +7,8 @@ resource "aws_api_gateway_rest_api" "vuln_api" {
     lambda_get_authorizer = aws_lambda_function.lambda_get_authorizer.arn,
     lambda_post_authorizer = aws_lambda_function.lambda_post_authorizer.arn,
     lambda_api_backend_post = aws_lambda_function.lambda_api_backend_post.arn,
-    lambda_api_backend = aws_lambda_function.lambda_api_backend.arn
+    lambda_api_backend = aws_lambda_function.lambda_api_backend.arn,
+    api_invoke_role = aws_iam_role.invocation_role.arn
   })
   endpoint_configuration {
     types = ["REGIONAL"]
@@ -17,7 +18,8 @@ resource "aws_api_gateway_rest_api" "vuln_api" {
     aws_lambda_function.lambda_get_authorizer,
     aws_lambda_function.lambda_post_authorizer,
     aws_lambda_function.lambda_api_backend_post,
-    aws_lambda_function.lambda_api_backend
+    aws_lambda_function.lambda_api_backend,
+    aws_api_gateway_account.cloudwatch
   ]
 }
 

@@ -32,7 +32,9 @@ variable "domain_name" {
   type =  string
 }
 
-variable "domain_certificate_arn" {
-  description = "Create an AWS Certifcate Maanger (ACM) certifcate for the above the domain name. You can either import this into ACM or create a new one. For creating a new one, you will need to validate if you own the domain by creating a CNAME in the DNS records as directed by Amazon. When importing a new one, validation is not required for TLS but it becomes mandatory for mutual TLS (mTLS) with a domain ownership certificate"
+variable "domain_prefix" {
+  description = "Prefix for domain name"
   type =  string
 }
+
+

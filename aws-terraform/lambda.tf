@@ -8,6 +8,10 @@ resource "aws_lambda_function" "lambda_get_authorizer" {
   source_code_hash = filebase64sha256("./GET_authorizer_lambda/my-deployment-package.zip")
   runtime          = "python3.8"
   kms_key_arn      = aws_kms_key.kms_key.arn
+  vpc_config {
+    subnet_ids         = [aws_subnet.private-a.id]
+    security_group_ids = [aws_security_group.lambda-sg.id]
+  }
 
   environment {
     variables = {
@@ -24,6 +28,10 @@ resource "aws_lambda_function" "lambda_api_backend" {
   source_code_hash = filebase64sha256("./GET_backend_lambda/my-deployment-package.zip")
   runtime          = "python3.8"
   kms_key_arn      = aws_kms_key.kms_key.arn
+  vpc_config {
+    subnet_ids         = [aws_subnet.private-a.id]
+    security_group_ids = [aws_security_group.lambda-sg.id]
+  }
 
   environment {
     variables = {
@@ -40,6 +48,10 @@ resource "aws_lambda_function" "lambda_post_authorizer" {
   source_code_hash = filebase64sha256("./POST_authorizer_lambda/my-deployment-package.zip")
   runtime          = "python3.8"
   kms_key_arn      = aws_kms_key.kms_key.arn
+  vpc_config {
+    subnet_ids         = [aws_subnet.private-a.id]
+    security_group_ids = [aws_security_group.lambda-sg.id]
+  }
 
   environment {
     variables = {
@@ -56,6 +68,10 @@ resource "aws_lambda_function" "lambda_api_backend_post" {
   source_code_hash = filebase64sha256("./POST_backend_lambda/my-deployment-package.zip")
   runtime          = "python3.8"
   kms_key_arn      = aws_kms_key.kms_key.arn
+  vpc_config {
+    subnet_ids         = [aws_subnet.private-a.id]
+    security_group_ids = [aws_security_group.lambda-sg.id]
+  }
 
   environment {
     variables = {

@@ -7,26 +7,22 @@ authorizer_table_name = os.environ.get('POST_AUTHORIZER_TABLE_NAME')
 
 def lambda_handler(event, context):
     
-    print(event)
     client = get_OU(event)
-    print(client)
-    authorized_client = get_authorized_client(client)
 
+    if 'methodArn' not in event:
+        print("could not find 'methodArn' key in event")
+        return generate_policy(client, 'Deny', '')
+        
+    # Since this is a demo deployment, I am not verifying the Issuer of the client certificate
+    # For Production systems, Issuer OU and CN need to be verified before validating the client subject OU
     print("Checking if Client: {} is authorized to use POST API".format(client))
+    authorized_client = get_authorized_client(client)
     if(authorized_client):
-        print("Auhtorization successfull")
-        return {
-            "principalId": "client",
-            "policyDocument": {
-                "Version": "2012-10-17",
-                "Statement": [
-                {   
-                    "Action": "execute-api:Invoke",
-                    "Effect": "Allow"
-                }
-                ]
-            }
-        }
+        print("Authorization successfull")
+        return generate_policy(client, 'Allow', event['methodArn'])
+    else:
+        print("Authorization denied")
+        return generate_policy(client, 'Deny', event['methodArn'])
         
 def get_OU(event):
     subjectDN = event['requestContext']['identity']['clientCert']['subjectDN']
@@ -42,36 +38,27 @@ def get_authorized_client(client):
     table = dynamodb.Table(authorizer_table_name)
     try:
         response = table.get_item(Key={'Client': client})
-        print(response)
     except ClientError as e:
         print(e.response['Error']['Message'])
-        print("Auhtorization denied")
-        return {
-            "principalId": "client",
-            "policyDocument": {
-                "Version": "2012-10-17",
-                "Statement": [
-                {   
-                    "Action": "execute-api:Invoke",
-                    "Effect": "Deny"
-                }
-                ]
-            }
-        }
     else:
         if('Item' in response):
             return response['Item']
-        else:
-            print("Auhtorization denied")
-            return {
-                "principalId": "client",
-                "policyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                    {   
-                        "Action": "execute-api:Invoke",
-                        "Effect": "Deny"
-                    }
-                    ]
+
+def generate_policy(principal_id: str, effect: str, method_arn):
+    authResponse = {}
+    authResponse['principalId'] = principal_id
+
+    if effect and method_arn:
+        policyDocument = {
+            'Version': '2012-10-17',
+            'Statement': [
+                {
+                    'Action': 'execute-api:Invoke',
+                    'Effect': effect,
+                    'Resource': method_arn
                 }
-            }
+            ]
+        }
+        authResponse['policyDocument'] = policyDocument
+
+    return authResponse

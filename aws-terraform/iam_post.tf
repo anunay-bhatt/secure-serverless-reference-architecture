@@ -72,8 +72,6 @@ resource "aws_iam_role" "role_api_backend_post" {
     ]
   })
 
-  permissions_boundary = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/PCSKPermissionsBoundary"
-
 }
 
 resource "aws_iam_policy_attachment" "policy_attach1_post" {

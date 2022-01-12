@@ -11,10 +11,10 @@ OU_with_GET_authorization = [
     }
   ]
 
-source_ip_address = "13.110.54.43/32"
+source_ip_address = "13.110.54.40/32"
 
 stage_name = "test"
 
-domain_name = "refarch.ab-lumos.link"
+domain_name = "ab-lumos.link"
 
-domain_certificate_arn = "arn:aws:acm:us-west-2:259963121161:certificate/69f8ee0c-3a71-446f-8e83-b724d05c029a"
+domain_prefix = "serverless"

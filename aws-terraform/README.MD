@@ -6,14 +6,7 @@
 
 2. A domain name which you own and which will be used as the main url for the VMS service. Update your domain name in the terraform.tfvars file
 
-3. A public certificate issued by AWS Certifcate Maanger (ACM) certifcate for the above the domain name. Note that ACM would ask you for domain verification with DNS record update or email verification. Update your ACM certificate in the terraform.tfvars file 
-
-Please note - It is possible to import your own certificate into ACM and use it as part of this solution. You will still need to create an ACM-issued cert for domain verification purposes. This cert would not be used for TLS connection. If following such approach, please update the domain.tf code to include a domain verification cert. 
-
-<link to ACM documentation>
-<link to mTLS with API gateway>
-
-4. The API Gateway has mTLS enabled which means clients would need to present their certifcate which would be authentictaed by the server with a trust bundle. Ergo, create a self-signed certificate with openssl and provide the CA cert public key bundle in the repo - ??  
+3. The API Gateway has mTLS enabled which means clients would need to present their certifcate which would be authentictaed by the server with a trust bundle. For the puposes of this demo, create self-signed certificates for CA, POST Client and GET using the below commands:
 
 Certificate Authority:
 
@@ -26,7 +19,7 @@ This certificat is used for creating/adding new vulnerability data to the databa
 
         openssl genrsa -out client/client_post.key 2048
 
-"Make sure that you put an apporpriate OU in the below CSR. This OU would be used for authorization of the client. You will update the same in the variable -- OU_with_POST_authorization"
+"Make sure that you put an apporpriate OU in the below CSR. This OU would be used for authorization of the client. You will update the same in the terraform.tfvars file variable -- OU_with_POST_authorization"
 
         openssl req -new -key client/client_post.key -out client/client_post.csr
         openssl x509 -req -days 365 -sha256 -in client/client_post.csr -CA ca.crt -CAkey ca.key -set_serial 2 -out client/client_post.crt
@@ -36,16 +29,16 @@ This certificat is used for viewing vulnerability data from the database
 
         openssl genrsa -out client/client_get.key 2048
 
-"Make sure that you put an apporpriate OU in the below CSR. This OU would be used for authorization of the client. You will update the same in the variable -- OU_with_GET_authorization"
+"Make sure that you put an apporpriate OU in the below CSR. This OU would be used for authorization of the client. You will update the same in the terraform.tfvars file variable -- OU_with_GET_authorization"
 
         openssl req -new -key client/client_get.key -out client/client_get.csr
         openssl x509 -req -days 365 -sha256 -in client/client_get.csr -CA ca.crt -CAkey ca.key -set_serial 2 -out client/client_get.crt
 
-5. Upload your trust bundle which is the public certificate for your root CA at "./trustbundle/certificates.pem"
+4. Upload your trust bundle which is the public certificate for your root CA at "./trustbundle/ca.pem"
 
-6. Update the OU name for the certificate that will use the POST API in the variable in terraform.tfvars file --> "OU_with_POST_authorization"
+5. Update the OU name for the certificate that will use the POST API in the variable in terraform.tfvars file --> "OU_with_POST_authorization"
 
-7. Update the OU name for the certificate that will be used for the GET API in the variable in terraform.tfvars file --> "OU_with_GET_authorization". Please also mention the Orgs that this partcular OU will have authroization to access. 
+6. Update the OU name for the certificate that will be used for the GET API in the variable in terraform.tfvars file --> "OU_with_GET_authorization". Please also mention the Orgs that this partcular OU will have authorization to access. 
 
 
 ## Inputs
@@ -66,18 +59,32 @@ Table below:
 
 ## Post deployment instructions
 
-1. The default endpoint created by API Gateway is disabled by deafult as it can bypass mTLS controls. In order to hit the API endpoint created by custom domain name, you will need to update your DNS records withan alias. 
+The default endpoint created by API Gateway is disabled as it can bypass mTLS controls. You will be reaching to the API with the custom domain name which you supplied as input to the Terraform. This Terraform code also updates the DNS record for the domain with an alias for the API Gateway endpoint.
 
-An example below: 
-Domain name : ""
-A name : ""
+1. Using the POST client certificate, you will be successfull with the following curl request: 
+curl -v -X POST --cert ./client_post/client_post.crt --key ./client_post/client_post.key "https://serverless.<your_domain_name>/vuln" --header "Content-Type: application/json" --data '{
+          "VulnID" : "testID3",
+          "Org" : "org1",
+          "AssetName" : "lax-psg-g.internal.org.com",
+          "DueDate"   : "09-09-2022",
+          "PluginId"  : 23234,
+          "PluginName" : "Palo Alto confusion ADE-OS Local File Inclusion",
+          "Priority"  : "234234234"
+}'
 
-Changes should be propagated in about a minute or more in some cases
+2. If you try to use the above POST request with the GET client using the below command, you will receive an access error: 
+curl -v -X POST --cert ./client_post/client_get.crt --key ./client_post/client_get.key "https://serverless.<your_domain_name>/vuln" --header "Content-Type: application/json" --data '{
+          "VulnID" : "testID3",
+          "Org" : "org1",
+          "AssetName" : "lax-psg-g.internal.org.com",
+          "DueDate"   : "09-09-2022",
+          "PluginId"  : 23234,
+          "PluginName" : "Palo Alto confusion ADE-OS Local File Inclusion",
+          "Priority"  : "234234234"
+}'
 
-2. Using the POST client certificate, you will be successfull with the following curl request: 
+3. Using the GET client certificate, you will get response for the following curl request: 
+curl -v -X GET --cert ./client_get/client_get.crt --key ./client_get/client_get.key "https://serverless.<your_domain_name>/vuln?org=org1"
 
-3. Using the POST client certificate, you will NOT be successfull with the following curl request: 
-
-4. Using the GET client certificate, you will get response for the following curl request: 
-
-5. Using the GET client certificate, you will NOT get response for the following curl request: 
+4. Check for other orgs which are given access to the GET client, you will the access denied error: 
+curl -v -X GET --cert ./client_get/client_get.crt --key ./client_get/client_get.key "https://serverless.ab-lumos.link/vuln?org=org5"

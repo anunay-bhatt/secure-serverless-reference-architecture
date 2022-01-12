@@ -1,6 +1,7 @@
 import boto3
 from botocore.exceptions import ClientError
 import os
+import json
 
 backend_table_name = os.environ.get('BACKEND_TABLE_NAME')
 
@@ -18,7 +19,9 @@ def lambda_handler(event, context):
     value = get_vuln(org)
     if value:
         print("Get vulnerabilities for org succeded:")
-        return {org: value}
+        response = {org: value}
+        # Encoding the json before sending to prevent against JSON injection attacks downstream
+        return json.dumps(response)
     else:
         print("No value found")
         

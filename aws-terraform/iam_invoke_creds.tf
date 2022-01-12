@@ -20,7 +20,6 @@ resource "aws_iam_role" "invocation_role" {
 }
 EOF
 
-  permissions_boundary = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/PCSKPermissionsBoundary"
 }
 
 resource "aws_iam_role_policy" "invocation_policy_get" {

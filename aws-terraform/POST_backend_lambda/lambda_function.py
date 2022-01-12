@@ -26,14 +26,15 @@ def lambda_handler(event, context):
         
         else:
             print("Input not received: {}".format(input))
-            return {
+            response = {
                 "statusCode": 400,
                 "message": "Invalid request body. missing below input",
                 "input": input
             }
+            # Encoding the json before sending to prevent against JSON injection attacks downstream
+            return json.dumps(response)
         
     value = post_vuln(input_dict)
-    print(value)
     if 'ResponseMetadata' in value:
         if 'HTTPStatusCode' in value['ResponseMetadata']:
             if value['ResponseMetadata']['HTTPStatusCode'] == 200:

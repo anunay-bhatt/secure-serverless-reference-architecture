@@ -32,7 +32,7 @@ Table here with "Security Area" and "Security Control"
             <td>Least Privilege - Serverless cloud resources must only have the least amount of permissions to perform their task and no more. Ergo, in cases of unwanted abuse of these resources, the blast radius would be minimal.</td>
         </tr>
         <tr>
-            <td rowspan=2>Network Security</td>
+            <td rowspan=5>Network Security</td>
             <td>API Customers must only be able to access the REST APIs from specific network locations (ip addresses)</td>
         </tr>
         <tr>

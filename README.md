@@ -8,7 +8,7 @@ VMS is a Vulnerability API service which provides secure API based access to the
 
 The service uses AWS serverless components and the infratructure that can be deployed via Terraform. Below is a simple architecture:
 
-## Security Controls
+## Integrated Security Controls
 
 Table here with "Security Area" and "Security Control"
 
@@ -23,17 +23,17 @@ Table here with "Security Area" and "Security Control"
     <tbody>
         <tr>
             <td rowspan=3>IAM</td>
-            <td>Authentication via digital certificates using mutual TLS (mTLS)</td>
+            <td>Authentication is enabled via digital certificates using mutual TLS (mTLS)</td>
         </tr>
         <tr>
-            <td>Lambda Authorizers to validate the Organization Unit (OU) field of the client certificate against the resources that that particular cert is allowed to access. Such a mapping could be created in a cloud serverless database like DynamoDB</td>
+            <td>Lambda Authorizers are used to validate the Organization Unit (OU) field of the client certificate against the resources that that particular cert is allowed to access. Such a mapping is created in DynamoDB</td>
         </tr>
         <tr>
-            <td>Least Privilege - Serverless cloud resources must only have the least amount of permissions to perform their task and no more. Ergo, in cases of unwanted abuse of these resources, the blast radius would be minimal.</td>
+            <td>Least Privilege - Serverless cloud resources only have the least amount of permissions to perform their task and no more. Ergo, in cases of unwanted abuse of these resources, the blast radius would be minimal.</td>
         </tr>
         <tr>
             <td rowspan=5>Network Security</td>
-            <td>API Customers must only be able to access the REST APIs from specific network locations (ip addresses)</td>
+            <td>API Customers can only access the REST API from specific network locations (ip addresses)</td>
         </tr>
         <tr>
             <td>Encryption in transit with TLS must be enabled on the API endpoint and only secure TLS protocol and cipher version must be used</td>

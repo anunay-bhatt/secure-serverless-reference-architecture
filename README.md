@@ -23,24 +23,33 @@ Table here with "Security Area" and "Security Control"
     <tbody>
         <tr>
             <td rowspan=3>IAM</td>
-            <td>Authentication with mTLS</td>
+            <td>Authentication via digital certificates using mutual TLS (mTLS)</td>
         </tr>
         <tr>
-            <td>Lambda authrozation with OU</td>
+            <td>Lambda Authorizers to validate the Organization Unit (OU) field of the client certificate against the resources that that particular cert is allowed to access. Such a mapping could be created in a cloud serverless database like DynamoDB</td>
         </tr>
         <tr>
-            <td>Least Privilege</td>
+            <td>Least Privilege - Serverless cloud resources must only have the least amount of permissions to perform their task and no more. Ergo, in cases of unwanted abuse of these resources, the blast radius would be minimal.</td>
         </tr>
-        <tr>
-            <td rowspan=2>Logging</td>
-            <td>Cloudwatch</td>
-        </tr>
-        <tr>
-            <td>Cloudwatch2</td>
-        </tr>  
         <tr>
             <td rowspan=2>Network Security</td>
-            <td>API Gateway resource policy</td>
+            <td>API Customers must only be able to access the REST APIs from specific network locations (ip addresses)</td>
+        </tr>
+        <tr>
+            <td>Encryption in transit with TLS must be enabled on the API endpoint and only secure TLS protocol and cipher version must be used</td>
+        </tr> 
+        <tr>
+            <td>The default API endpoint must be disabled so that the TLS or mTLS controls on the custom domain are not bypassed by using the default domain</td>
+        </tr> 
+        <tr>
+            <td>Serverless cloud backend resources must not be publicly accessible. Configuration mistakes like these can inadvertently expose the backend data of serverless apps</td>
+        </tr> 
+         <tr>
+            <td>For inter-communication between services, if not configured otherwise, the traffic is routed via public Internet which seems rather unnecessary risk as these services are most probability are internal to your design. In such cases and as applicable with each cloud provider, it is advisable to use private endpoints so that traffic to serverless services be kept on cloud service provider's backbone network rather than Internet at large. Endpoint policy must be setup to only network access to a specific resource via the private endpoint</td>
+        </tr> 
+        <tr>
+            <td rowspan=2>Code Security Hygiene</td>
+            <td>API endpoints must have API throttling limits so that your API is not overwhelmed with too many requests and does not become non-functional.</td>
         </tr>
          <tr>
             <td>Test</td>

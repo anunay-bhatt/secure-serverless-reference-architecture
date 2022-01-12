@@ -1,4 +1,4 @@
-# Demo Serverless App - Vulnerability management system (VMS)
+# Demo Secure Serverless App - Vulnerability management system (VMS)
 
 This repo contains Terraform AWS configuration for deploying a demo serverless application.
 

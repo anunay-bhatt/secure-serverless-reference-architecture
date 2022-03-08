@@ -9,7 +9,7 @@ resource "aws_lambda_function" "lambda_get_authorizer" {
   runtime          = "python3.8"
   kms_key_arn      = aws_kms_key.kms_key.arn
   vpc_config {
-    subnet_ids         = [aws_subnet.private-a.id]
+    subnet_ids         = [aws_subnet.private1.id,aws_subnet.private2.id]
     security_group_ids = [aws_security_group.lambda-sg.id]
   }
 
@@ -29,7 +29,7 @@ resource "aws_lambda_function" "lambda_api_backend" {
   runtime          = "python3.8"
   kms_key_arn      = aws_kms_key.kms_key.arn
   vpc_config {
-    subnet_ids         = [aws_subnet.private-a.id]
+    subnet_ids         = [aws_subnet.private1.id,aws_subnet.private2.id]
     security_group_ids = [aws_security_group.lambda-sg.id]
   }
 
@@ -49,7 +49,7 @@ resource "aws_lambda_function" "lambda_post_authorizer" {
   runtime          = "python3.8"
   kms_key_arn      = aws_kms_key.kms_key.arn
   vpc_config {
-    subnet_ids         = [aws_subnet.private-a.id]
+    subnet_ids         = [aws_subnet.private1.id,aws_subnet.private2.id]
     security_group_ids = [aws_security_group.lambda-sg.id]
   }
 
@@ -69,7 +69,7 @@ resource "aws_lambda_function" "lambda_api_backend_post" {
   runtime          = "python3.8"
   kms_key_arn      = aws_kms_key.kms_key.arn
   vpc_config {
-    subnet_ids         = [aws_subnet.private-a.id]
+    subnet_ids         = [aws_subnet.private1.id,aws_subnet.private2.id]
     security_group_ids = [aws_security_group.lambda-sg.id]
   }
 

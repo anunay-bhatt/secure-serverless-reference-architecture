@@ -1,29 +1,31 @@
-resource "aws_vpc" "serverless" {
-  cidr_block       = "10.0.14.0/24"
+resource "aws_vpc" "main" {
+  cidr_block       = "10.0.0.0/20"
 
   tags = {
-    Name = "serverless"
+    Name = "serverless-vpc"
   }
 }
 
-resource "aws_subnet" "public" {
-  vpc_id     = aws_vpc.serverless.id
-  cidr_block = "10.0.14.0/27"
-  availability_zone = "us-west-2a"
+resource "aws_subnet" "private1" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.0.0/22"
+  availability_zone = "us-west-1"
 
   tags = {
-    Name = "public"
+    Type = "Private",
+    Name = "private1"
   }
 }
 
-resource "aws_subnet" "private-a" {
-  vpc_id     = aws_vpc.serverless.id
-  cidr_block = "10.0.14.32/27"
-  availability_zone = "us-west-2a"
+resource "aws_subnet" "private2" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.4.0/22"
+  availability_zone = "us-east-1"
 
   tags = {
-    Name = "private-a"
-  }
+    Type = "Private",
+    Name = "private2"
+ }
 }
 
 /*resource "aws_subnet" "private-b" {
@@ -66,6 +68,44 @@ resource "aws_subnet" "private-a" {
   }
 }
 */
+
+resource "aws_route_table" "rtb_private_connectivity" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "10.0.0.0/20"
+    local_gateway_id = "local"
+  }
+
+  route {
+    cidr_block = aws_vpc_endpoint.s3.prefix_list_id
+    vpc_endpoint_id = aws_vpc_endpoint.s3.id
+  }
+
+  route {
+    cidr_block = aws_vpc_endpoint.dynamodb.prefix_list_id
+    vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
+  }
+
+  tags = {
+    Type = "private_connectivity"
+  }
+}
+
+resource "aws_route_table_association" "a" {
+  subnet_id      = aws_subnet.private1.id
+  route_table_id = aws_route_table.rtb_private_connectivity.id
+}
+
+resource "aws_route_table_association" "b" {
+  subnet_id      = aws_subnet.private2.id
+  route_table_id = aws_route_table.rtb_private_connectivity.id
+}
+
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id       = aws_vpc.main.id
+  service_name = "com.amazonaws.us-west-2.s3"
+}
 
 resource "aws_vpc_endpoint" "dynamodb" {
   vpc_id       = aws_vpc.serverless.id
@@ -135,7 +175,7 @@ EOF
 }
 
 #Fetching route tables, needed for VPC endpoint association
-data "aws_route_table" "rtb_for_endpoint" {
+/*data "aws_route_table" "rtb_for_endpoint" {
   vpc_id = aws_vpc.serverless.id
 }
 
@@ -144,6 +184,7 @@ resource "aws_vpc_endpoint_route_table_association" "endpoint_rtb" {
   vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
 }
 
+*/
 data "aws_prefix_list" "prefix_for_endpoint" {
   name = "com.amazonaws.us-west-2.dynamodb"
 }

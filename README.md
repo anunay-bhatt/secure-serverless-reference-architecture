@@ -10,7 +10,7 @@ Please note, this is just one of the many ways developers can deploy such an app
 
 AWS serverless resources are used for creating this architecture with API Gateway used for API management, Lambda used as the Logic layer and the persistent layer being DynamoDB. OpenAPI specification is used for creating the two API endpoints - GET and POST with API Gateway. Lambda is used first for authorizing the requests coming in via API Gateway and then for processing the authorized requests. Similarly, DynamoDB is used for storing two kinds of data - one being the metadata to authorize requests and second the vulnerability data itself for the application. 
 
-<Architecture Diagram>
+![](https://github.com/ab-lumos/secure-serverless-reference-architecture/blob/master/Application_Architecture_sample_serverless_app.jpeg)
 
 ## Integrated Security Controls
 This table provides a summary of the various security controls integrated with this sample application. For a detailed justification of these, refer to the Medium article <link to article here>

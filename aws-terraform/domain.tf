@@ -34,8 +34,8 @@ resource "aws_s3_bucket" "bucket_truststore" {
   }
   # Enabling logging for the S3 bucket
   logging {
-    target_bucket = aws_s3_bucket.bucket_truststore.id
-    target_prefix = "log/"
+    target_bucket = aws_s3_bucket.logging_bucket.id
+    target_prefix = "vuln-api-truststore-s3-logs"
   }
 }
 

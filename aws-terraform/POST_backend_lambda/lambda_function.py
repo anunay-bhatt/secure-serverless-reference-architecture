@@ -22,7 +22,6 @@ def lambda_handler(event, context):
     for input in input_dict:
         if (input in event["body-json"]):
             input_dict[input] = event["body-json"][input]
-            print("Received: {} = {}".format(input, input_dict[input])); 
         
         else:
             print("Input not received: {}".format(input))

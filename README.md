@@ -72,88 +72,168 @@ Table here with "Security Area" and "Security Control"
 
 1. An AWS account and privileges to deploy the related infrastructure as part of this repo
 
-2. A domain name which you own and which will be used as the main url for the VMS service. Update your domain name in the terraform.tfvars file
+2. A Route53 domain name created in the same AWS account which will be used as the main url for the serverless service
 
-3. The API Gateway has mTLS enabled which means clients would need to present their certifcate which would be authentictaed by the server with a trust bundle. For the puposes of this demo, create self-signed certificates for CA, POST Client and GET using the below commands:
+### Deployment Steps
 
-Certificate Authority:
+1. The API Gateway has mTLS enabled which means clients would need to present their certifcate which would be authentictaed by the server with a trust bundle. For the puposes of this demo, we would create self-signed certificates for CA, POST Client and GET client.
 
-        openssl genrsa -aes256 -out ca/ca.key 4096 chmod 400 ca/ca.key
-        openssl req -new -x509 -sha256 -days 730 -key ca/ca.key -out ca/ca.crt
-        chmod 444 ca/ca.crt
+In your local system, create the following directory structure
 
-POST Client Certificate:
-This certificat is used for creating/adding new vulnerability data to the database
+        TMP_DIR="$HOME/tmp"
+        mkdir $TMP_DIR
+        mkdir $TMP_DIR/ca
+        mkdir $TMP_DIR/client1
+        mkdir $TMP_DIR/client2
 
-        openssl genrsa -out client/client_post.key 2048
+Setting up the local Certificate Authority:
+
+        openssl genrsa -aes256 -out $TMP_DIR/ca/ca.key 4096 chmod 400 $TMP_DIR/ca/ca.key
+            <Enter passphrase>
+        openssl req -new -x509 -sha256 -days 730 -key $TMP_DIR/ca/ca.key -out $TMP_DIR/ca/ca.crt
+            <Enter previous passphrase>
+            <Enter following details for CA cert = Country, State, City, ON, OU, CN, Email>
+        chmod 444 $TMP_DIR/ca/ca.crt
+
+Setting Client1 which will be used to make GET requests to the serverless application: 
+
+        openssl genrsa -out $TMP_DIR/client1/client1.key 2048
 
 "Make sure that you put an apporpriate OU in the below CSR. This OU would be used for authorization of the client. You will update the same in the terraform.tfvars file variable -- OU_with_POST_authorization"
 
-        openssl req -new -key client/client_post.key -out client/client_post.csr
-        openssl x509 -req -days 365 -sha256 -in client/client_post.csr -CA ca.crt -CAkey ca.key -set_serial 2 -out client/client_post.crt
+        openssl req -new -key $TMP_DIR/client1/client1.key -out $TMP_DIR/client1/client1.csr
+            <Enter following details for the cert = Country, State, City, ON, OU, CN, Email>
+        openssl x509 -req -days 365 -sha256 -in $TMP_DIR/client1/client1.csr -CA $TMP_DIR/ca/ca.crt -CAkey $TMP_DIR/ca/ca.key -set_serial 2 -out $TMP_DIR/client1/client1.crt
+            <Enter previous passphrase, the one used for CA>
 
-GET Client Certificate:
-This certificat is used for viewing vulnerability data from the database
+Setting Client2 which will be used to make GET requests to the serverless application: 
 
-        openssl genrsa -out client/client_get.key 2048
+        openssl genrsa -out $TMP_DIR/client2/client2.key 2048
 
 "Make sure that you put an apporpriate OU in the below CSR. This OU would be used for authorization of the client. You will update the same in the terraform.tfvars file variable -- OU_with_GET_authorization"
 
-        openssl req -new -key client/client_get.key -out client/client_get.csr
-        openssl x509 -req -days 365 -sha256 -in client/client_get.csr -CA ca.crt -CAkey ca.key -set_serial 2 -out client/client_get.crt
+        openssl req -new -key $TMP_DIR/client2/client2.key -out $TMP_DIR/client2/client2.csr
+            <Enter following details for the cert = Country, State, City, ON, OU, CN, Email>
+        openssl x509 -req -days 365 -sha256 -in $TMP_DIR/client2/client2.csr -CA $TMP_DIR/ca/ca.crt -CAkey $TMP_DIR/ca/ca.key -set_serial 2 -out $TMP_DIR/client2/client2.crt
+            <Enter previous passphrase, the one used for CA>
 
-4. Upload your trust bundle which is the public certificate for your root CA at "./trustbundle/ca.pem"
+Confirm that you see the 3 certificates for CA, Client1 and Client2 with appropriate details: 
 
-5. Update the OU name for the certificate that will use the POST API in the variable in terraform.tfvars file --> "OU_with_POST_authorization"
+        openssl x509 -in $TMP_DIR/ca/ca.crt -text -noout | grep Subject
+            <This will be your trust bundle that would be handed over to API Gateway for mTLS authentication of requests>
+        openssl x509 -in $TMP_DIR/client1/client1.crt -text -noout | grep Subject
+            <This will be the client used for making POST requests>
+        openssl x509 -in $TMP_DIR/client2/client2.crt -text -noout | grep Subject
+            <This will be the client used for making GET requests>
 
-6. Update the OU name for the certificate that will be used for the GET API in the variable in terraform.tfvars file --> "OU_with_GET_authorization". Please also mention the Orgs that this partcular OU will have authorization to access. 
+2. Upload your trust bundle which is the public certificate for the CA to this git repo at "./aws-terraform/truststore/ca.pem"
 
+        cp $TMP_DIR/ca/ca.crt ./aws-terraform/truststore/ca.pem
 
-### Inputs
-Update terraform.tfvars with your input values as necessary:
+3. Update terraform variable - "OU_with_POST_authorization" with the OU name of the certificate that will be used for maing POST request to the serverless application --> make changes in the ./aws-terraform/terraform.tfvars file
 
-Table below: 
+4. Update terraform variable - "OU_with_GET_authorization" with the OU name of the certificate that will be used for maing GET request to the serverless application and the specific orgs to which the access would be provided  --> make changes in the ./aws-terraform/terraform.tfvars file. By default, six orgs which demo data are created as part of this module. 
 
+5. Update the IP address of your machine in the variable "source_ip_address" at ./aws-terraform/terraform.tfvars file
 
-### Terraform apply
-Plan, apply and check results
+        curl ipecho.net/plain
 
+6. Update your domain name in the variable "domain_name" at ./aws-terraform/terraform.tfvars file
+The Terraform code would create a new ACM cert with this domain to be used by API Gateway as the server certificate. Route53 domain record would be updated to include an alias for this domain with the API Gateway endpoint. 
+
+7. If you have made any custom changes to any Lambda function code, make sure you update the respective zip file with the updated Lambda code
+
+        zip -g my-deployment-package.zip lambda_function.py
+
+7. Terraform plan and apply
+This Terraform is tested with v1.1.7
+
+        cd ./aws-terraform/
+        terraform --version
+        export AWS_ACCESS_KEY_ID="your_AWS_ACCESS_ID"
+        export AWS_SECRET_ACCESS_KEY="your_AWS_SECRET_KEY"
+        export AWS_SESSION_TOKEN="your_AWS_SESSION_TOKEN"
+        export AWS_REGION="us-west-2"
+        terraform init
         terraform plan
         terraform apply
 
-### Outputs
+Note that the first apply would result in a failure with the error - "Error creating API Gateway Domain Name: BadRequestException: The provided certificate is not in state ISSUED". This is expected since ACM changes can sometimes display eventual consistency issues with other AWS services during certificate creation/deletion, so the API Gateway service may not be able to see the new ACM certificate immediately after its created. For details on this issue - [Can not create aws_api_gateway_domain_name on the first run]<https://github.com/hashicorp/terraform-provider-aws/issues/10447>
+
+### Deployment Outputs
  
-Table below: 
+Terraform would output the default endpoint created by API Gateway but this endpoint is disabled as part of secure by default configuration since it can bypass mTLS controls. You will be reaching to the API with the custom domain name which you supplied as input to the Terraform. See the next section on testing. 
 
-### Post deployment instructions
+### Post deployment testing instructions
 
-The default endpoint created by API Gateway is disabled as it can bypass mTLS controls. You will be reaching to the API with the custom domain name which you supplied as input to the Terraform. This Terraform code also updates the DNS record for the domain with an alias for the API Gateway endpoint.
+1. Create a new self-signed certificate signed by a different CA to test if mTLS authentication works. 
 
-1. Using the POST client certificate, you will be successfull with the following curl request: 
-curl -v -X POST --cert ./client_post/client_post.crt --key ./client_post/client_post.key "https://serverless.<your_domain_name>/vuln" --header "Content-Type: application/json" --data '{
-          "VulnID" : "testID3",
-          "Org" : "org1",
-          "AssetName" : "lax-psg-g.internal.org.com",
-          "DueDate"   : "09-09-2022",
-          "PluginId"  : 23234,
-          "PluginName" : "Palo Alto confusion ADE-OS Local File Inclusion",
-          "Priority"  : "234234234"
-}'
+        mkdir $TMP_DIR/ca2
+        mkdir $TMP_DIR/client3
+        openssl genrsa -aes256 -out $TMP_DIR/ca2/ca2.key 4096 chmod 400 $TMP_DIR/ca2/ca2.key
+            <Enter passphrase>
+        openssl req -new -x509 -sha256 -days 730 -key $TMP_DIR/ca2/ca2.key -out $TMP_DIR/ca2/ca2.crt
+            <Enter previous passphrase>
+            <Enter following details for CA cert = Country, State, City, ON, OU, CN, Email>
+        chmod 444 $TMP_DIR/ca2/ca2.crt
+        openssl genrsa -out $TMP_DIR/client3/client3.key 2048
+        openssl req -new -key $TMP_DIR/client3/client3.key -out $TMP_DIR/client3/client3.csr
+            <Enter following details for the cert = Country, State, City, ON, OU, CN, Email>
+        openssl x509 -req -days 365 -sha256 -in $TMP_DIR/client3/client3.csr -CA $TMP_DIR/ca2/ca2.crt -CAkey $TMP_DIR/ca2/ca2.key -set_serial 2 -out $TMP_DIR/client3/client3.crt
+            <Enter previous passphrase, the one used for CA>
+        openssl x509 -in $TMP_DIR/client3/client3.crt -text -noout | grep Subject
 
-2. If you try to use the above POST request with the GET client using the below command, you will receive an access error: 
-curl -v -X POST --cert ./client_post/client_get.crt --key ./client_post/client_get.key "https://serverless.<your_domain_name>/vuln" --header "Content-Type: application/json" --data '{
-          "VulnID" : "testID3",
-          "Org" : "org1",
-          "AssetName" : "lax-psg-g.internal.org.com",
-          "DueDate"   : "09-09-2022",
-          "PluginId"  : 23234,
-          "PluginName" : "Palo Alto confusion ADE-OS Local File Inclusion",
-          "Priority"  : "234234234"
-}'
+Make GET request with the above cert
 
-3. Using the GET client certificate, you will get response for the following curl request: 
-curl -v -X GET --cert ./client_get/client_get.crt --key ./client_get/client_get.key "https://serverless.<your_domain_name>/vuln?org=org1"
+        curl -v -X GET --cert $TMP_DIR/client3/client3.crt --key $TMP_DIR/client3/client3.key "https://serverless.<your_domain_name>/vuln?org=org1"
 
-4. Check for other orgs which are given access to the GET client, you will the access denied error: 
-curl -v -X GET --cert ./client_get/client_get.crt --key ./client_get/client_get.key "https://serverless.ab-lumos.link/vuln?org=org5"
+{"message":"Forbidden"}
 
+2. Test with intermediate cert
+
+        mkdir $TMP_DIR/client6
+        openssl genrsa -out $TMP_DIR/client6/client6.key 2048
+        openssl req -new -key $TMP_DIR/client6/client6.key -out $TMP_DIR/client6/client6.csr
+        openssl x509 -req -days 365 -sha256 -in $TMP_DIR/client6/client6.csr -CA $TMP_DIR/client1/client1.crt -CAkey $TMP_DIR/client1/client1.key -set_serial 2 -out $TMP_DIR/client6/client6.crt
+        openssl x509 -in $TMP_DIR/client6/client6.crt -text -noout | grep Subject
+        openssl x509 -in $TMP_DIR/client6/client6.crt -text -noout | grep Issuer
+
+2. Using the Client1 certificate, you will be successfull with the following curl request: 
+
+        curl -v -X POST --cert $TMP_DIR/client1/client1.crt --key $TMP_DIR/client1/client1.key "https://serverless.<your_domain_name>/vuln" --header "Content-Type: application/json" --data '{
+                "VulnID" : "testID3",
+                "Org" : "org1",
+                "AssetName" : "lax-psg-g.internal.org.com",
+                "DueDate"   : "09-09-2022",
+                "PluginId"  : 23234,
+                "PluginName" : "Palo Alto confusion ADE-OS Local File Inclusion",
+                "Priority"  : "234234234"
+        }'
+
+{"statusCode": 200, "message": "Post vulnerability succeeded"}
+
+3. If you try to use the above POST request with the Client2 certificate, you will receive an access error: 
+
+        curl -v -X POST --cert $TMP_DIR/client2/client2.crt --key $TMP_DIR/client2/client2.key "https://serverless.<your_domain_name>/vuln" --header "Content-Type: application/json" --data '{
+                "VulnID" : "testID3",
+                "Org" : "org1",
+                "AssetName" : "lax-psg-g.internal.org.com",
+                "DueDate"   : "09-09-2022",
+                "PluginId"  : 23234,
+                "PluginName" : "Palo Alto confusion ADE-OS Local File Inclusion",
+                "Priority"  : "234234234"
+        }'
+
+{"Message":"User is not authorized to access this resource with an explicit deny"}
+
+4. If you use the GET curl command for fetching details for org1 with the Client2 certificate, you will see the vulnerability details for org1: 
+
+        curl -v -X GET --cert $TMP_DIR/client2/client2.crt --key $TMP_DIR/client2/client2.key "https://serverless.<your_domain_name>/vuln?org=org1"
+
+"{\"org1\": [{\"Org\": {\"S\": \"org1\"}, \"Priority\": {\"S\": \"P2\"}, \"AssetName\": {\"S\": \"lax3-org-g.internal.org.com\"}, \"VulnID\": {\"S\": \"2b5f5331-1701-105a-0cce-e17058c5c221\"}, \"PluginId\": {\"N\": \"15446\"}, \"PluginName\": {\"S\": \"Cisco ADE-OS Local File Inclusion (cisco-sa-ade-xcvAQEOZ)\"}, \"DueDate\": {\"S\": \"05-06-2022\"}}, {\"Org\": {\"S\": \"org1\"}, \"Priority\": {\"S\": \"234234234\"}, \"AssetName\": {\"S\": \"lax-psg-g.internal.org.com\"}, \"VulnID\": {\"S\": \"testID3\"}, \"PluginId\": {\"N\": \"23234\"}, \"PluginName\": {\"S\": \"Palo Alto confusion ADE-OS Local File Inclusion\"}, \"DueDate\": {\"S\": \"09-09-2022\"}}]}"
+
+5. If you use the GET curl command for fetching details for org4 with the Client2 certificate, you will see an authorization error:
+
+        curl -v -X GET --cert $TMP_DIR/client2/client2.crt --key $TMP_DIR/client2/client2.key "https://serverless.<your_domain_name>/vuln?org=org5"
+
+{"Message":"User is not authorized to access this resource with an explicit deny"}

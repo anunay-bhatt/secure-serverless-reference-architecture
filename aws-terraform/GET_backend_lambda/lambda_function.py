@@ -20,7 +20,7 @@ def lambda_handler(event, context):
     if value:
         print("Get vulnerabilities for org succeded:")
         response = {org: value}
-        # Encoding the json before sending to prevent against JSON injection attacks downstream
+        # Encoding the json before sending to prevent against JSON injection attacks in downstream
         return json.dumps(response)
     else:
         print("No value found")

@@ -37,4 +37,10 @@ variable "domain_prefix" {
   type =  string
 }
 
+variable "key_admins" {
+  description = "ARNs that can administer KMS keys"
+  type        = list
+  default     = []
+}
+
 

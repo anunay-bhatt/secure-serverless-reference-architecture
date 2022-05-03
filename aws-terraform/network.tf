@@ -9,7 +9,7 @@ resource "aws_vpc" "main" {
 resource "aws_subnet" "private1" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.0.0/22"
-  availability_zone = "us-west-1"
+  availability_zone = "us-west-2a"
 
   tags = {
     Type = "Private",
@@ -20,7 +20,7 @@ resource "aws_subnet" "private1" {
 resource "aws_subnet" "private2" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.4.0/22"
-  availability_zone = "us-east-1"
+  availability_zone = "us-west-2b"
 
   tags = {
     Type = "Private",
@@ -72,23 +72,23 @@ resource "aws_subnet" "private2" {
 resource "aws_route_table" "rtb_private_connectivity" {
   vpc_id = aws_vpc.main.id
 
-  route {
-    cidr_block = "10.0.0.0/20"
-    local_gateway_id = "local"
-  }
+  #route {
+  #  cidr_block = "10.0.0.0/20"
+  #  local_gateway_id = "local"
+  #}
 
-  route {
-    cidr_block = aws_vpc_endpoint.s3.prefix_list_id
-    vpc_endpoint_id = aws_vpc_endpoint.s3.id
-  }
+  #route {
+  #  cidr_block = aws_vpc_endpoint.s3.prefix_list_id
+  #  vpc_endpoint_id = aws_vpc_endpoint.s3.id
+  #}
 
-  route {
-    cidr_block = aws_vpc_endpoint.dynamodb.prefix_list_id
-    vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
-  }
+  #route {
+  #  cidr_block = aws_vpc_endpoint.dynamodb.prefix_list_id
+  #  vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
+  #}
 
   tags = {
-    Type = "private_connectivity"
+    Name = "serverless_rtb_private"
   }
 }
 
@@ -105,11 +105,13 @@ resource "aws_route_table_association" "b" {
 resource "aws_vpc_endpoint" "s3" {
   vpc_id       = aws_vpc.main.id
   service_name = "com.amazonaws.us-west-2.s3"
+  route_table_ids = [aws_route_table.rtb_private_connectivity.id]
 }
 
 resource "aws_vpc_endpoint" "dynamodb" {
-  vpc_id       = aws_vpc.serverless.id
+  vpc_id       = aws_vpc.main.id
   service_name = "com.amazonaws.us-west-2.dynamodb"
+  route_table_ids = [aws_route_table.rtb_private_connectivity.id]
   policy = <<EOF
 {
   "Statement": [
@@ -192,7 +194,7 @@ data "aws_prefix_list" "prefix_for_endpoint" {
 resource "aws_security_group" "lambda-sg" {
   name        = "serverless_lambda_sg"
   description = "Allow outbound traffic to DynamoDB"
-  vpc_id      = aws_vpc.serverless.id
+  vpc_id      = aws_vpc.main.id
   egress = [
     {
       description = "TLS from Lambda to VPC"

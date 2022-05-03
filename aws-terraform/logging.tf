@@ -47,7 +47,7 @@ resource "aws_s3_bucket" "logging_bucket" {
               "Service": "cloudtrail.amazonaws.com"
             },
             "Action": "s3:GetBucketAcl",
-            "Resource": "arn:aws:s3:::tf-test-trail"
+            "Resource": "arn:aws:s3:::serverless-refarch-logging-bucket"
         },
         {
             "Sid": "AWSCloudTrailWrite",
@@ -55,8 +55,12 @@ resource "aws_s3_bucket" "logging_bucket" {
             "Principal": {
               "Service": "cloudtrail.amazonaws.com"
             },
-            "Action": "s3:PutObject",
-            "Resource": "arn:aws:s3:::tf-test-trail/prefix/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
+            "Action": [
+              "s3:PutObject"
+            ],
+            "Resource": [
+              "arn:aws:s3:::serverless-refarch-logging-bucket/*"
+            ],
             "Condition": {
                 "StringEquals": {
                     "s3:x-amz-acl": "bucket-owner-full-control"
@@ -66,6 +70,22 @@ resource "aws_s3_bucket" "logging_bucket" {
     ]
 }
 POLICY
+
+  # Enabling logging for the S3 bucket
+  logging {
+    target_bucket = "serverless-refarch-logging-bucket"
+    target_prefix = "selflog/"
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        kms_master_key_id = aws_kms_key.kms_key.id
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
+
 }
 
 # Network Flow logs are enabled below for the VPC
@@ -102,7 +122,7 @@ EOF
 
 resource "aws_iam_role_policy" "flowlogs_policy" {
   name = "refarch-serverless-flowlogs_policy"
-  role = aws_iam_role.example.id
+  role = aws_iam_role.flowlogs_role.id
 
   policy = <<EOF
 {

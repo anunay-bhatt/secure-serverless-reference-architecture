@@ -36,6 +36,8 @@ paths:
           required: true
           schema:
             type: string
+            #Matches only characters and numbers
+            pattern: ^[a-zA-Z0-9]*$
       responses:
         '200':
           description: get vulnerabilities matching org name

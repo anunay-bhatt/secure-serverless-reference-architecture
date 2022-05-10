@@ -2,6 +2,8 @@
 
 [Related Medium Article - A secure reference design for a serverless application](TBD)
 
+![](https://github.com/anunay-bhatt/secure-serverless-reference-architecture/blob/master/serverless.jpeg)
+
 Serverless computing can help organizations reduce the operational overhead while delivering highly scalable and reliable services to the customers in a cost effective manner. But does using these serverless services also reduce the burden of security implementation? Simple answer is yes, since there is no server for the customers to manage, the security responsibilities that come with it are naturally reduced. As the cartoon illustrates, Serverless does not mean no servers. It means no responsibility for you to manage the servers yourself as your cloud provider would do the heavy lifting for you. 
 
 Then why really bother with this article about serverless security when it's majorly taken care of by the cloud provider. One obvious reason is that not everything is managed by your provider, you as a customer still have some security responsibilities. And second, using analogy, just because you have bought a yearly pest control treatment for your house, it does not mean that you would leave food all over the place, right? Meaning you would still need to follow security practices to reduce risk on your system. This article is just about that - helping you reduce your risk for a serverless application. 

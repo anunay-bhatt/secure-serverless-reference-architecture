@@ -22,78 +22,79 @@ Table here with "Security Area" and "Security Control"
     <thead>
         <tr>
             <th>Security Area</th>
+            <th>Control#</th>
             <th>Security Control</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td rowspan=1>Authentication</td>
-            <td>IAM 1.1 In the demo application, authentication is enabled via digital certificates using mutual TLS (mTLS). A root CA certificate is configured as part of API Gateway in order to authenticate client certificates.</td>
+            <td rowspan=1 >Authentication</td>
+            <td>IAM 1.1</td> <td>In the demo application, authentication is enabled via digital certificates using mutual TLS (mTLS). A root CA certificate is configured as part of API Gateway in order to authenticate client certificates.</td>
         </tr>
         <tr>
-            <td rowspan=1>Authorization</td>
-            <td>IAM 1.2 In the demo app, after mTLS authentication is successful, authorization happens via Lambda functions that validate if the OU (Organization Unit) in the certificate is authorized to perform the specific API method on the specific resource. This mapping is made accessible to the Lambda function via a DynamoDB table.</td>
+            <td rowspan=1 text-align=center>Authorization</td>
+            <td>IAM 1.2 </td> <td>In the demo app, after mTLS authentication is successful, authorization happens via Lambda functions that validate if the OU (Organization Unit) in the certificate is authorized to perform the specific API method on the specific resource. This mapping is made accessible to the Lambda function via a DynamoDB table.</td>
         </tr>
         <tr>
             <td rowspan=1>Least Privilege</td>
-            <td>IAM 1.3 Serverless cloud resources have the least amount of permissions to perform their task and no more. Ergo, in cases of unwanted abuse of these resources, the blast radius is minimal. Some examples - 1)Serverless cloud resources have the least amount of permissions to perform their task and no more. Ergo, in cases of unwanted abuse of these resources, the blast radius is minimal. 2) The AWS IAM role for the Lambda function to respond to the GET API only has permissions - "dynamodb:GetItem" and "dynamodb:Query" on the specific DyanamoDB table</td>
+            <td>IAM 1.3 </td> <td>Serverless cloud resources have the least amount of permissions to perform their task and no more. Ergo, in cases of unwanted abuse of these resources, the blast radius is minimal. Some examples - 1)Serverless cloud resources have the least amount of permissions to perform their task and no more. Ergo, in cases of unwanted abuse of these resources, the blast radius is minimal. 2) The AWS IAM role for the Lambda function to respond to the GET API only has permissions - "dynamodb:GetItem" and "dynamodb:Query" on the specific DyanamoDB table</td>
         </tr>
         <tr>
             <td rowspan=5>Network Security</td>
-            <td>NS 1.1 In the demo application, the endpoint is public but it is restricted to be only accessed from my laptop ip address using resource policy on the API Gateway</td>
+            <td>NS 1.1 </td> <td>In the demo application, the endpoint is public but it is restricted to be only accessed from my laptop ip address using resource policy on the API Gateway</td>
         </tr>
         <tr>
-            <td>NS 1.2 Encryption in transit with TLS is enabled on the API endpoint and only secure TLS protocol and cipher version is used</td>
+            <td>NS 1.2 </td> <td>Encryption in transit with TLS is enabled on the API endpoint and only secure TLS protocol and cipher version is used</td>
         </tr> 
         <tr>
-            <td>NS 1.3 The default API endpoint is disabled so that the mTLS controls on the custom domain are not bypassed by using the default domain</td>
+            <td>NS 1.3 </td> <td>The default API endpoint is disabled so that the mTLS controls on the custom domain are not bypassed by using the default domain</td>
         </tr> 
         <tr>
-            <td>NS 1.4 Serverless cloud backend resources are not directly accessible by public urls or public cloud accounts. Cloud configuration mistakes like making a S3 bucket public can inadvertently expose the backend data of serverless apps</td>
+            <td>NS 1.4 </td> <td>Serverless cloud backend resources are not directly accessible by public urls or public cloud accounts. Cloud configuration mistakes like making a S3 bucket public can inadvertently expose the backend data of serverless apps</td>
         </tr> 
          <tr>
-            <td>NS 1.5 For inter-communication between services, if not configured otherwise, the traffic is routed via public Internet, which seems like an unnecessary risk as these services, in most probability, are internal to your design. In such cases and as applicable with each cloud provider, it is advisable to use private endpoints so that traffic to serverless services be kept on cloud service provider's backbone network rather than Internet at large. Endpoint policy is setup to only allow network access to a specific resource via the private endpoint</td>
+            <td>NS 1.5 </td> <td>For inter-communication between services, if not configured otherwise, the traffic is routed via public Internet, which seems like an unnecessary risk as these services, in most probability, are internal to your design. In such cases and as applicable with each cloud provider, it is advisable to use private endpoints so that traffic to serverless services be kept on cloud service provider's backbone network rather than Internet at large. Endpoint policy is setup to only allow network access to a specific resource via the private endpoint</td>
         </tr> 
         <tr>
             <td rowspan=5>Code Security Hygiene</td>
-            <td>CSH 1.1 Input is the most dangerous component of any code from a security perspective as each input field is a potential security vector that an attacker can leverage, and so care is taken before ingesting, processing or forwarding it to any third-party</td>
+            <td>CSH 1.1 </td> <td>Input is the most dangerous component of any code from a security perspective as each input field is a potential security vector that an attacker can leverage, and so care is taken before ingesting, processing or forwarding it to any third-party</td>
         </tr>
          <tr>
-            <td>CSH 1.2 API endpoints have API throttling limits so that the API is not overwhelmed with too many requests and does not become non-functional in the event of a denial of service attack</td>
+            <td>CSH 1.2 </td> <td>API endpoints have API throttling limits so that the API is not overwhelmed with too many requests and does not become non-functional in the event of a denial of service attack</td>
         </tr> 
          <tr>
-            <td>CSH 1.3 API endpoints have proper error handling with a duo objective - to store details logs internally for debugging by admins and to not reveal internal design/application details in the output to the customer. Also, it's common sense, but execution of the program stops when an error occurs</td>
+            <td>CSH 1.3 </td> <td>API endpoints have proper error handling with a duo objective - to store details logs internally for debugging by admins and to not reveal internal design/application details in the output to the customer. Also, it's common sense, but execution of the program stops when an error occurs</td>
         </tr> 
          <tr>
-            <td>CSH 1.4 Even Serverless applications are susceptible to database injection attacks and care is taken while implementing the queries that are run against the serverless databases like DynamoDB</td>
+            <td>CSH 1.4 </td> <td>Even Serverless applications are susceptible to database injection attacks and care is taken while implementing the queries that are run against the serverless databases like DynamoDB</td>
         </tr> 
          <tr>
-            <td>CSH 1.5 Lambda function code must be treated like any other code in the organization i.e. it must be built via organizational CICD pipelines that have integrated static code analysis, dynamic analysis and third-party vulnerability scanning (e.g. using Snyk)</td>
+            <td>CSH 1.5 </td> <td>Lambda function code must be treated like any other code in the organization i.e. it must be built via organizational CICD pipelines that have integrated static code analysis, dynamic analysis and third-party vulnerability scanning (e.g. using Snyk)</td>
         </tr> 
          <tr>
-            <td rowspan=2>Data Protection</td>
-            <td>DP 1.1 In order to prevent against exposure of data stored on public cloud via physical access to disks, all data stored on public cloud is encrypted with a secure symmetric algorithm like AES-256. Depending on the degree of security compliance required, data is either encrypted by customer supplied key (CSEK), or customer managed key (CMEK) or cloud provider managed key. The options you have also depends on the type of cloud service you are interacting with.</td>
+            <td rowspan=3>Data Protection</td>
+            <td>DP 1.1 </td> <td>In order to prevent against exposure of data stored on public cloud via physical access to disks, all data stored on public cloud is encrypted with a secure symmetric algorithm like AES-256. Depending on the degree of security compliance required, data is either encrypted by customer supplied key (CSEK), or customer managed key (CMEK) or cloud provider managed key. The options you have also depends on the type of cloud service you are interacting with.</td>
         </tr>
-            <td>DP 1.2 For customer-management of the cloud provider encryption key, be mindful of the following taking the examples of AWS KMS service: 1) In the demo app, for the centralized management of key access policies, AWS IAM is enabled to help control access of the CMK. This is done by assigning key permissions to the root AWS user - arn:aws:iam::${aws:PrincipalAccount}:root}. Assigning kms:* to the above AWS user is "not secure" as it allows any IAM role in the same account with proper IAM permissions to perform sensitive key admin activities. Therefore KMS policy specifically DENIES sensitive privileges like key deletion and only allows these sensitive actions to be done by select few IAM roles 2) Automatic key rotation is enabled for the CMK based on the organizational key rotation policy</td>
+            <td>DP 1.2 </td> <td>For customer-management of the cloud provider encryption key, be mindful of the following taking the examples of AWS KMS service: 1) In the demo app, for the centralized management of key access policies, AWS IAM is enabled to help control access of the CMK. This is done by assigning key permissions to the root AWS user - arn:aws:iam::${aws:PrincipalAccount}:root}. Assigning kms:* to the above AWS user is "not secure" as it allows any IAM role in the same account with proper IAM permissions to perform sensitive key admin activities. Therefore KMS policy specifically DENIES sensitive privileges like key deletion and only allows these sensitive actions to be done by select few IAM roles 2) Automatic key rotation is enabled for the CMK based on the organizational key rotation policy</td>
         </tr>
         </tr>
-            <td>DP 1.3 Data stored on cloud which is critical to the functioning of the organization and its customers is backed up for time period (RTO and RPO) as defined in the organizational policy. The backup snapshots are also copied to a different geographical region to plan for cloud provider region outages **(NOT CURRENTLY ENABLED ON THIS REPO)**</td>
-        </tr>
-         <tr>
-            <td rowspan=2>Logging</td>
-            <td>LO 1.1 Authentication and Authorization logs are stored by the Lambda function in CloudWatch and include details like user id, timestamp, resource, access failure reason, etc. that can help in forensic investigation later</td>
+            <td>DP 1.3 </td> <td>Data stored on cloud which is critical to the functioning of the organization and its customers is backed up for time period (RTO and RPO) as defined in the organizational policy. The backup snapshots are also copied to a different geographical region to plan for cloud provider region outages **NOT CURRENTLY ENABLED ON THIS REPO**</td>
         </tr>
          <tr>
-            <td>LO 1.2 Cloud provider activity logs which provide details on who ran which api on what resource are stored in S3 bucket. These logs are useful for forensic investigations to create an event sequence. CloudTrail is enabled with specific data events from Lambda, S3 and DynamoDB. API Gateway logs are also enabled to log all API activities</td>
+            <td rowspan=5>Logging</td>
+            <td>LO 1.1 </td> <td>Authentication and Authorization logs are stored by the Lambda function in CloudWatch and include details like user id, timestamp, resource, access failure reason, etc. that can help in forensic investigation later</td>
         </tr>
          <tr>
-            <td>LO 1.3 Networking logs provide ingress/egress ip address, port and protocol which can be used to track lateral movement from a particular compromised host. These are enabled via VPC flow logs in AWS</td>
+            <td>LO 1.2 </td> <td>Cloud provider activity logs which provide details on who ran which api on what resource are stored in S3 bucket. These logs are useful for forensic investigations to create an event sequence. CloudTrail is enabled with specific data events from Lambda, S3 and DynamoDB. API Gateway logs are also enabled to log all API activities</td>
         </tr>
          <tr>
-            <td>LO 1.4 All the logs stored are retained as per your organizational data retention policy based on regulatory compliance. Therefore its easier to store all logs in a central location like S3 and enforce retention and backup standards on this single location **(NOT CURRENTLY ENABLED ON THIS REPO)**</td>
+            <td>LO 1.3 </td> <td>Networking logs provide ingress/egress ip address, port and protocol which can be used to track lateral movement from a particular compromised host. These are enabled via VPC flow logs in AWS</td>
         </tr>
          <tr>
-            <td>LO 1.5 Preventative IAM policies explicitly deny the deletion of any of these log files. In AWS, you can do this by creating SCP to prevent users from deleting a particular S3 bucket, cloudwatch log or Glacier vault. You may also do this by creating Permission boundaries around IAM roles **(NOT CURRENTLY ENABLED ON THIS REPO)**</td>
+            <td>LO 1.4 </td> <td>All the logs stored are retained as per your organizational data retention policy based on regulatory compliance. Therefore its easier to store all logs in a central location like S3 and enforce retention and backup standards on this single location **NOT CURRENTLY ENABLED ON THIS REPO**</td>
+        </tr>
+         <tr>
+            <td>LO 1.5 </td> <td>Preventative IAM policies explicitly deny the deletion of any of these log files. In AWS, you can do this by creating SCP to prevent users from deleting a particular S3 bucket, cloudwatch log or Glacier vault. You may also do this by creating Permission boundaries around IAM roles **NOT CURRENTLY ENABLED ON THIS REPO**</td>
         </tr>
 
     </tbody>

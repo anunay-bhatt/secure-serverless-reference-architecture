@@ -101,7 +101,6 @@ This table provides a summary of the various security controls integrated with t
          <tr>
             <td>LO 1.5 </td> <td>Preventative IAM policies explicitly deny the deletion of any of these log files. In AWS, you can do this by creating SCP to prevent users from deleting a particular S3 bucket, cloudwatch log or Glacier vault. You may also do this by creating Permission boundaries around IAM roles **NOT CURRENTLY ENABLED ON THIS REPO**</td>
         </tr>
-
     </tbody>
 </table>
 
@@ -280,4 +279,4 @@ Make GET request with the above cert
 
 ## Concluding Notes
 
-In my previous article, I talked about how Security engineers can provide valuable guidance to developers by creating simple, relatable and adoptable Reference Architectures - Uncomplicate Security for developers using Reference Architectures. In this article, I used the example of a demo serverless application and demonstrated the integration of security controls to reduce the risk of this application. I hope I was able to strengthen my case to the security engineers with regard to the efficacy of reference architectures in demonstrating secure patterns. For the developers reading this, I hope the demo app and the security discussion here will be of help to you in integrating security best practices early on in your serverless journey. Thank you for reading!
+In my previous article, I talked about how Security engineers can provide valuable guidance to developers by creating simple, relatable and adoptable Reference Architectures - [Uncomplicate Security for developers using Reference Architectures](https://anunay-bhatt.medium.com/embedding-security-into-sdlc-using-reference-architectures-for-developers-29403c00fb3d). In this article, I used the example of a demo serverless application and demonstrated the integration of security controls to reduce the risk of this application. I hope I was able to strengthen my case to the security engineers with regard to the efficacy of reference architectures in demonstrating secure patterns. For the developers reading this, I hope the demo app and the security discussion here will be of help to you in integrating security best practices early on in your serverless journey. Thank you for reading!

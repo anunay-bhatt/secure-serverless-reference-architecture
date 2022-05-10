@@ -11,10 +11,12 @@ OU_with_GET_authorization = [
     }
   ]
 
-source_ip_address = "67.188.92.120/32"
+#example source_ip_address = "2.3.2.4/32"
+source_ip_address = ""
 
 stage_name = "test"
 
-domain_name = "ab-lumos.link"
+#example domain_name = "google.com"
+domain_name = ""
 
 domain_prefix = "serverless"

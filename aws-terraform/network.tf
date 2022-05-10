@@ -28,64 +28,8 @@ resource "aws_subnet" "private2" {
  }
 }
 
-/*resource "aws_subnet" "private-b" {
-  vpc_id     = aws_vpc.serverless.id
-  cidr_block = "10.0.14.64/27"
-  availability_zone = "us-west-2b"
-
-  tags = {
-    Name = "private-b"
-  }
-}
-*/
-
-#Outward connectivity to the Internet for private resources
-#resource "aws_nat_gateway" "nat" {
-#  connectivity_type = "private"
-#  subnet_id         = aws_subnet.private-a.id
-#}
-
-/*resource "aws_security_group" "lambda-sg" {
-  name        = "serverless_lambda_sg"
-  description = "Allow outbound traffic to DynamoDB"
-  vpc_id      = aws_vpc.serverless.id
-  egress = [
-    {
-      description = "TLS from Lambda to VPC"
-      from_port   = 443
-      to_port     = 443
-      protocol    = "tcp"
-      cidr_blocks = ["10.0.14.0/24"]
-      ipv6_cidr_blocks = []
-      prefix_list_ids = []
-      security_groups = []
-      self = false
-    }
-  ]
-
-  tags = {
-    Name = "allow_tls"
-  }
-}
-*/
-
 resource "aws_route_table" "rtb_private_connectivity" {
   vpc_id = aws_vpc.main.id
-
-  #route {
-  #  cidr_block = "10.0.0.0/20"
-  #  local_gateway_id = "local"
-  #}
-
-  #route {
-  #  cidr_block = aws_vpc_endpoint.s3.prefix_list_id
-  #  vpc_endpoint_id = aws_vpc_endpoint.s3.id
-  #}
-
-  #route {
-  #  cidr_block = aws_vpc_endpoint.dynamodb.prefix_list_id
-  #  vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
-  #}
 
   tags = {
     Name = "serverless_rtb_private"
@@ -176,17 +120,6 @@ resource "aws_vpc_endpoint" "dynamodb" {
 EOF
 }
 
-#Fetching route tables, needed for VPC endpoint association
-/*data "aws_route_table" "rtb_for_endpoint" {
-  vpc_id = aws_vpc.serverless.id
-}
-
-resource "aws_vpc_endpoint_route_table_association" "endpoint_rtb" {
-  route_table_id  = data.aws_route_table.rtb_for_endpoint.id
-  vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
-}
-
-*/
 data "aws_prefix_list" "prefix_for_endpoint" {
   name = "com.amazonaws.us-west-2.dynamodb"
 }

@@ -1,4 +1,4 @@
-# Reference Architecture for a secure Serverless Application
+# Security reference architecture for a serverless application
 
 [Related Medium Article - A secure reference design for a serverless application](TBD)
 

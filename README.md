@@ -277,3 +277,7 @@ Make GET request with the above cert
         curl -v -X GET --cert $TMP_DIR/client2/client2.crt --key $TMP_DIR/client2/client2.key "https://serverless."$DOMAIN_NAME"/vuln?org=org5"
 
 {"Message":"User is not authorized to access this resource with an explicit deny"}
+
+## Concluding Notes
+
+In my previous article, I talked about how Security engineers can provide valuable guidance to developers by creating simple, relatable and adoptable Reference Architectures - Uncomplicate Security for developers using Reference Architectures. In this article, I used the example of a demo serverless application and demonstrated the integration of security controls to reduce the risk of this application. I hope I was able to strengthen my case to the security engineers with regard to the efficacy of reference architectures in demonstrating secure patterns. For the developers reading this, I hope the demo app and the security discussion here will be of help to you in integrating security best practices early on in your serverless journey. Thank you for reading!

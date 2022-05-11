@@ -2,7 +2,7 @@
 
 [Related Medium Article - A secure reference design for a serverless application](TBD)
 
-<p align="center">
+<p align="left">
   <img 
     src="https://github.com/anunay-bhatt/secure-serverless-reference-architecture/blob/master/serverless.jpeg"
   >

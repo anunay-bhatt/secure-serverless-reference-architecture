@@ -1,6 +1,6 @@
 # Security reference architecture for a serverless application
 
-[Related Medium Article - A secure reference design for a serverless application](TBD)
+[Related Medium Article - A secure reference design for a serverless application](https://anunay-bhatt.medium.com/security-reference-architecture-for-a-serverless-application-2fcd25b1d5e2)
 
 <p align="left">
   <img 
@@ -27,7 +27,7 @@ In this simple example, a serverless application processes, stores and serves vu
 ![](https://github.com/ab-lumos/secure-serverless-reference-architecture/blob/master/Application_Architecture_sample_serverless_app.jpeg)
 
 ## Integrated Security Controls
-This table provides a summary of the various security controls integrated with this sample application. For a detailed description of these, refer to the Medium article - [A secure reference design for a serverless application](TBD)
+This table provides a summary of the various security controls integrated with this sample application. For a detailed description of these, refer to the Medium article - [A secure reference design for a serverless application](https://anunay-bhatt.medium.com/security-reference-architecture-for-a-serverless-application-2fcd25b1d5e2)
 
 <table>
     <thead>

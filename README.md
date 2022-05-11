@@ -16,7 +16,7 @@ I will take the example of a demo serverless application and walk through what c
 
 ## Demo Application
 
-I have created a demo serverless application to use as reference for this article - demo vulnerability management system app which securely exposes REST APIs with AWS services- API Gateway, Lambda, DynamoDB and S3. The example code is for AWS but the same concepts can be extended to any other public cloud environment.
+This demo vulnerability management system app securely exposes REST APIs with AWS services- API Gateway, Lambda, DynamoDB and S3. The example code is for AWS but the same concepts can be extended to any other public cloud environment.
 
 In this simple example, a serverless application processes, stores and serves vulnerability data to its customers:
 - Vulnerability scanner services like Nessus send a POST request with vulnerability data to the Route53 domain name which aliases to the API Gateway custom domain name
